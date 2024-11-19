@@ -8,7 +8,7 @@ export interface IExercise extends Document {
   equipment: string[];
   targetMuscleGroups: string[];
   description?: string;
-  weeklyPlanIds: Types.ObjectId[];
+  weeklyExercisePlanIds: Types.ObjectId[];
 }
 
 const ExerciseSchema: Schema = new Schema({
@@ -19,7 +19,7 @@ const ExerciseSchema: Schema = new Schema({
   equipment: { type: [String], default: [] },
   targetMuscleGroups: { type: [String], default: [] },
   description: { type: String },
-  weeklyPlanIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "WeeklyPlan" }],
+  weeklyExericsePlanIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "WeeklyExercisePlan" }],
 });
 
 const Exercise = mongoose.models.Exercise || mongoose.model<IExercise>("Exercise", ExerciseSchema);

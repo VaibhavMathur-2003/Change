@@ -8,7 +8,7 @@ export interface IYoga extends Document {
   equipment: string[];
   targetMuscleGroups: string[];
   description?: string;
-  weeklyPlanIds: Types.ObjectId[];
+  weeklyYogaPlanIds: Types.ObjectId[];
 }
 
 const YogaSchema: Schema = new Schema({
@@ -19,7 +19,7 @@ const YogaSchema: Schema = new Schema({
   equipment: { type: [String], default: [] },
   targetMuscleGroups: { type: [String], default: [] },
   description: { type: String },
-  weeklyPlanIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "WeeklyPlan" }],
+  weeklyYogaPlanIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "WeeklyYogaPlan" }],
 });
 
 const Yoga = mongoose.models.Yoga || mongoose.model<IYoga>("Yoga", YogaSchema);

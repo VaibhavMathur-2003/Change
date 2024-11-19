@@ -85,7 +85,7 @@ export default function Component() {
               </p>
             </CardContent>
             <CardFooter>
-              <Link href={`/${category.title}`}>
+              <Link href={`/${category.title.toLocaleLowerCase()}`}>
               <Button
                 className={`w-full bg-gradient-to-r ${category.color} text-white hover:opacity-90 transition-opacity duration-300`}
               >

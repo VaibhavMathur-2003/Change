@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import Groq from "groq-sdk";
 import Exercise from "../../../models/Exercise";
-import WeeklyPlan from "../../../models/WeeklyPlan";
+import WeeklyExercisePlans from "../../../models/WeeklyExercisePlan";
 import User from "../../../models/User";
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     // Find user and populate their weekly plans and exercises
     const user = await User.findOne({ uuid: userId })
       .populate({
-        path: "weeklyPlans",
+        path: "weeklyExercisePlans",
         populate: {
           path: "Exercise",
           model: "Exercise",
@@ -46,16 +46,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (user.weeklyPlans && user.weeklyPlans.length > 0) {
+    if (user.weeklyExercisePlans && user.weeklyExercisePlans.length > 0) {
       return NextResponse.json({
         success: true,
         message: "Retrieved existing exercise plan",
-        data: user.weeklyPlans,
+        data: user.weeklyExercisePlans,
         isExisting: true,
       });
     }
 
-    let weeklyPlan;
+    let weeklyExercisePlan;
     try {
       const userProfile = `
             Age: ${user.age}
@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
         throw new Error("Invalid response format: not an array");
       }
 
-      weeklyPlan = parsedContent;
+      weeklyExercisePlan = parsedContent;
     } catch (error) {
       console.error("Error with Groq API:", error);
       return NextResponse.json(
@@ -152,9 +152,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (weeklyPlan) {
+    if (weeklyExercisePlan) {
       const savedPlans = await Promise.all(
-        weeklyPlan.map(async (dayPlan: any) => {
+        weeklyExercisePlan.map(async (dayPlan: any) => {
           const exercisePromises = dayPlan.exercises.map(
             async (exercise: any) => {
               const newExercise = new Exercise({
@@ -172,35 +172,35 @@ export async function POST(req: NextRequest) {
 
           const savedExercises = await Promise.all(exercisePromises);
 
-          const newWeeklyPlan = new WeeklyPlan({
+          const newWeeklyExercisePlans = new WeeklyExercisePlans({
             userId: userId,
             day: dayPlan.day,
             Exercise: savedExercises.map((exercise) => exercise._id),
           });
 
-          const savedWeeklyPlan = await newWeeklyPlan.save();
+          const savedWeeklyExercisePlans = await newWeeklyExercisePlans.save();
 
           await Promise.all(
             savedExercises.map((exercise) =>
               Exercise.findByIdAndUpdate(exercise._id, {
-                $push: { weeklyPlanIds: savedWeeklyPlan._id },
+                $push: { weeklyExercisePlanIds: savedWeeklyExercisePlans._id },
               })
             )
           );
 
           await User.findOneAndUpdate(
             { uuid: userId },
-            { $push: { weeklyPlans: savedWeeklyPlan._id } },
+            { $push: { weeklyExercisePlans: savedWeeklyExercisePlans._id } },
             { new: true }
           );
 
-          return savedWeeklyPlan;
+          return savedWeeklyExercisePlans;
         })
       );
 
       const newUserPlans = await User.findOne({ uuid: userId })
         .populate({
-          path: "weeklyPlans",
+          path: "weeklyExercisePlans",
           populate: {
             path: "Exercise",
             model: "Exercise",
@@ -212,7 +212,7 @@ export async function POST(req: NextRequest) {
         success: true,
         message:
           "Personalized weekly exercise plan generated and saved successfully",
-        data: newUserPlans?.weeklyPlans || [],
+        data: newUserPlans?.weeklyExercisePlans || [],
         isExisting: false,
       });
     }

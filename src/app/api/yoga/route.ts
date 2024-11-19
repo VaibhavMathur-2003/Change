@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import Groq from "groq-sdk";
 import Yoga from "../../../models/Yoga";
-import WeeklyPlan from "../../../models/WeeklyPlan";
+import WeeklyYogaPlans from "../../../models/WeeklyYogaPlan";
 import User from "../../../models/User";
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     // Find user and populate their weekly plans and yogas
     const user = await User.findOne({ uuid: userId })
       .populate({
-        path: "weeklyPlans",
+        path: "weeklyYogaPlans",
         populate: {
           path: "Yoga",
           model: "Yoga",
@@ -46,16 +46,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (user.weeklyPlans && user.weeklyPlans.length > 0) {
+    if (user.weeklyYogaPlans && user.weeklyYogaPlans.length > 0) {
       return NextResponse.json({
         success: true,
         message: "Retrieved existing yoga plan",
-        data: user.weeklyPlans,
+        data: user.weeklyYogaPlans,
         isExisting: true,
       });
     }
 
-    let weeklyPlan;
+    let weeklyYogaPlan;
     try {
       const userProfile = `
             Age: ${user.age}
@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
         throw new Error("Invalid response format: not an array");
       }
 
-      weeklyPlan = parsedContent;
+      weeklyYogaPlan = parsedContent;
     } catch (error) {
       console.error("Error with Groq API:", error);
       return NextResponse.json(
@@ -151,9 +151,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (weeklyPlan) {
+    if (weeklyYogaPlan) {
       const savedPlans = await Promise.all(
-        weeklyPlan.map(async (dayPlan: any) => {
+        weeklyYogaPlan.map(async (dayPlan: any) => {
           const yogaPromises = dayPlan.yogas.map(
             async (yoga: any) => {
               const newYoga = new Yoga({
@@ -171,35 +171,35 @@ export async function POST(req: NextRequest) {
 
           const savedYogas = await Promise.all(yogaPromises);
 
-          const newWeeklyPlan = new WeeklyPlan({
+          const newWeeklyYogaPlan = new WeeklyYogaPlans({
             userId: userId,
             day: dayPlan.day,
             Yoga: savedYogas.map((yoga) => yoga._id),
           });
 
-          const savedWeeklyPlan = await newWeeklyPlan.save();
+          const savedWeeklyYogaPlan = await newWeeklyYogaPlan.save();
 
           await Promise.all(
             savedYogas.map((yoga) =>
               Yoga.findByIdAndUpdate(yoga._id, {
-                $push: { weeklyPlanIds: savedWeeklyPlan._id },
+                $push: { weeklyYogaPlanIds: savedWeeklyYogaPlan._id },
               })
             )
           );
 
           await User.findOneAndUpdate(
             { uuid: userId },
-            { $push: { weeklyPlans: savedWeeklyPlan._id } },
+            { $push: { weeklyYogaPlans: savedWeeklyYogaPlan._id } },
             { new: true }
           );
 
-          return savedWeeklyPlan;
+          return savedWeeklyYogaPlan;
         })
       );
 
       const newUserPlans = await User.findOne({ uuid: userId })
         .populate({
-          path: "weeklyPlans",
+          path: "weeklyYogaPlans",
           populate: {
             path: "Yoga",
             model: "Yoga",
@@ -211,7 +211,7 @@ export async function POST(req: NextRequest) {
         success: true,
         message:
           "Personalized weekly yoga plan generated and saved successfully",
-        data: newUserPlans?.weeklyPlans || [],
+        data: newUserPlans?.weeklyYogaPlans || [],
         isExisting: false,
       });
     }

@@ -10,7 +10,8 @@ export interface IUser extends Document {
   goal?: string;
   fitnessLevel?: string;
   injuries?: string;
-  weeklyPlans: Types.ObjectId[];
+  weeklyExercisePlans: Types.ObjectId[];
+  weeklyYogaPlans: Types.ObjectId[];
 }
 
 const UserSchema: Schema<IUser> = new Schema({
@@ -23,7 +24,8 @@ const UserSchema: Schema<IUser> = new Schema({
   goal: { type: String},
   fitnessLevel: { type: String, default: "beginner" },
   injuries: { type: String, default: "No" },
-  weeklyPlans: [{ type: mongoose.Schema.Types.ObjectId, ref: "WeeklyPlan" }]
+  weeklyExercisePlans: [{ type: mongoose.Schema.Types.ObjectId, ref: "WeeklyExercisePlan" }],
+  weeklyYogaPlans: [{ type: mongoose.Schema.Types.ObjectId, ref: "WeeklyYogaPlan" }]
 });
 
 const User = mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
