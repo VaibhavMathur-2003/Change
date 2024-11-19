@@ -28,11 +28,11 @@ import { useRouter } from "next/navigation";
 
 export default function FitnessForm() {
   const router = useRouter();
-  useEffect(()=>{
-    if(localStorage.getItem("changeAuth")){
-      router.push("/dashboard")
+  useEffect(() => {
+    if (localStorage.getItem("changeAuth")) {
+      router.push("/dashboard");
     }
-  },[])
+  }, [router]);
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({
     uuid: v4(),

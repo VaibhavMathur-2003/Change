@@ -44,20 +44,20 @@ export default function Component() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 flex flex-col items-center justify-center p-4 space-y-10">
+    <div className="min-h-screen bg-gray-800 flex flex-col items-center justify-center p-4 space-y-10">
       <div className="text-center space-y-4">
         <h1 className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
           Change
         </h1>
-        <p className="text-xl md:text-2xl text-gray-300">
+        <p className="text-xl md:text-xl text-gray-300">
           Transform Your Life, One Step at a Time
         </p>
       </div>
-      <div className="max-w-7xl w-full grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
+      <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
         {categories.map((category, index) => (
           <Card
             key={index}
-            className="bg-white/10 backdrop-blur-lg border-none text-white overflow-hidden hover:shadow-2xl transition-all duration-300 group"
+            className="bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 border-none text-white overflow-hidden hover:shadow-2xl transition-all duration-300 group"
           >
             <div className="relative h-48 overflow-hidden">
               <div

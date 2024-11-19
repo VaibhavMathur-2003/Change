@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Calendar, Dumbbell, AlertCircle } from "lucide-react";
 
-interface Exercise {
+interface Yoga {
   type: string;
   name: string;
   duration: number;
@@ -18,10 +18,10 @@ interface Exercise {
 
 interface DayPlan {
   day: string;
-  Exercise: Exercise[];
+  Yoga: Yoga[];
 }
 
-export default function ExercisePlanGenerator() {
+export default function YogaPlanGenerator() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [weeklyPlan, setWeeklyPlan] = useState<DayPlan[] | null>(null);
@@ -34,13 +34,13 @@ export default function ExercisePlanGenerator() {
     }
   }, []);
 
-  const fetchExercisePlan = async (currentUserId: string) => {
+  const fetchYogaPlan = async (currentUserId: string) => {
     if (!currentUserId) return;
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch("/api/exercise", {
+      const response = await fetch("/api/yoga", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -50,7 +50,7 @@ export default function ExercisePlanGenerator() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to fetch exercise plan");
+        throw new Error(errorData.message || "Failed to fetch yoga plan");
       }
 
       const data = await response.json();
@@ -68,7 +68,7 @@ export default function ExercisePlanGenerator() {
     const storedUserId = localStorage.getItem("changeAuth");
     if (storedUserId) {
       setUserId(storedUserId);
-      fetchExercisePlan(storedUserId);
+      fetchYogaPlan(storedUserId);
     }
   };
   useEffect(() => {
@@ -84,7 +84,7 @@ export default function ExercisePlanGenerator() {
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              User ID not found. Please log in to generate an exercise plan.
+              User ID not found. Please log in to generate an yoga plan.
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -97,7 +97,7 @@ export default function ExercisePlanGenerator() {
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         <header className="text-center mb-12">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
-            Weekly Exercise Plan Generator
+            Weekly Yoga Plan Generator
           </h1>
           <p className="text-xl text-gray-400 mt-4">
             Elevate your fitness journey with personalized workout routines
@@ -143,7 +143,7 @@ export default function ExercisePlanGenerator() {
                   {weeklyPlan[selectedDay].day}
                 </h2>
                 <div className="space-y-6">
-                  {weeklyPlan[selectedDay].Exercise.map((exercise, index) => {
+                  {weeklyPlan[selectedDay].Yoga.map((yoga, index) => {
                     return (
                       <div
                         key={index}
@@ -152,42 +152,42 @@ export default function ExercisePlanGenerator() {
                         <div className="flex items-center mb-3">
                           <Dumbbell className="h-8 w-8 text-purple-400 mr-3" />
                           <h3 className="text-xl font-semibold">
-                            {exercise.name}
+                            {yoga.name}
                           </h3>
                         </div>
                         <div className="grid grid-cols-2 gap-4 text-sm">
                           <div>
                             <span className="text-gray-400">Type:</span>{" "}
-                            {exercise.type}
+                            {yoga.type}
                           </div>
                           <div>
                             <span className="text-gray-400">Duration:</span>{" "}
-                            {exercise.duration} min
+                            {yoga.duration} min
                           </div>
                           <div>
                             <span className="text-gray-400">Intensity:</span>{" "}
                             <span
                               className={`px-2 py-1 rounded-full text-xs ${
-                                exercise.intensity === "High"
+                                yoga.intensity === "High"
                                   ? "bg-red-900 text-red-200"
-                                  : exercise.intensity === "Medium"
+                                  : yoga.intensity === "Medium"
                                   ? "bg-yellow-900 text-yellow-200"
                                   : "bg-green-900 text-green-200"
                               }`}
                             >
-                              {exercise.intensity}
+                              {yoga.intensity}
                             </span>
                           </div>
-                          {exercise.equipment && (
+                          {yoga.equipment && (
                             <div>
                               <span className="text-gray-400">Equipment:</span>{" "}
-                              {exercise.equipment.join(", ")}
+                              {yoga.equipment.join(", ")}
                             </div>
                           )}
                         </div>
-                        {exercise.description && (
+                        {yoga.description && (
                           <p className="text-gray-200 mt-3 text-base">
-                            {exercise.description}
+                            {yoga.description}
                           </p>
                         )}
                       </div>
