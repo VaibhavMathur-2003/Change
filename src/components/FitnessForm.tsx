@@ -51,6 +51,7 @@ export default function FitnessForm() {
   };
   const handleAuth = () => {
     localStorage.setItem("changeAuth", formData.uuid);
+    router.push("/dashboard");
   };
 
   const steps = [

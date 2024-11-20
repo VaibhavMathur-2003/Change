@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Calendar, Dumbbell, AlertCircle } from "lucide-react";
+import { Calendar, Dumbbell, AlertCircle, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Exercise {
   type: string;
@@ -15,15 +16,22 @@ interface Exercise {
   targetMuscleGroups: string[];
   description?: string;
 }
+interface INutrition extends Exercise {
+  breakfast: string; // List of items to eat for breakfast
+  lunch: string; // List of items to eat for lunch
+  snack: string; // List of items to eat for a snack
+  dinner: string; // List of items to eat for dinner
+  mealTimes?: string; // Preferred meal times (optional)
+}
 
 interface DayPlan {
-    day: string;
-    [key: string]: any; // Allow dynamic key for different plan types
-  }
+  day: string;
+  [key: string]: any; // Allow dynamic key for different plan types
+}
 interface Props {
   plan: string;
 }
-export default function ExercisePlanGenerator({plan}: Props) {
+export default function ExercisePlanGenerator({ plan }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [weeklyPlan, setWeeklyPlan] = useState<DayPlan[] | null>(null);
@@ -142,10 +150,11 @@ export default function ExercisePlanGenerator({plan}: Props) {
                 transition={{ duration: 0.3 }}
                 className="bg-gray-800 rounded-xl p-6 shadow-lg"
               >
-                <h2 className="text-3xl font-bold mb-6">
-                </h2>
+                <h2 className="text-3xl font-bold mb-6"></h2>
                 <div className="space-y-6">
-                  {weeklyPlan[selectedDay][plan[0].toUpperCase() + plan.slice(1)]?.map((exercise: Exercise, index: string) => {
+                  {weeklyPlan[selectedDay][
+                    plan[0].toUpperCase() + plan.slice(1)
+                  ]?.map((exercise: Exercise | INutrition, index: string) => {
                     return (
                       <div
                         key={index}
@@ -153,33 +162,41 @@ export default function ExercisePlanGenerator({plan}: Props) {
                       >
                         <div className="flex items-center mb-3">
                           <Dumbbell className="h-8 w-8 text-purple-400 mr-3" />
-                          <h3 className="text-xl font-semibold">
-                            {exercise.name}
-                          </h3>
+                          {exercise.name && (
+                            <h3 className="text-xl font-semibold">
+                              {exercise.name}
+                            </h3>
+                          )}
                         </div>
                         <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="text-gray-400">Type:</span>{" "}
-                            {exercise.type}
-                          </div>
-                          <div>
-                            <span className="text-gray-400">Duration:</span>{" "}
-                            {exercise.duration} min
-                          </div>
-                          <div>
-                            <span className="text-gray-400">Intensity:</span>{" "}
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs ${
-                                exercise.intensity === "High"
-                                  ? "bg-red-900 text-red-200"
-                                  : exercise.intensity === "Medium"
-                                  ? "bg-yellow-900 text-yellow-200"
-                                  : "bg-green-900 text-green-200"
-                              }`}
-                            >
-                              {exercise.intensity}
-                            </span>
-                          </div>
+                          {exercise.type && (
+                            <div>
+                              <span className="text-gray-400">Type:</span>
+                              {exercise.type}
+                            </div>
+                          )}
+                          {exercise.duration && (
+                            <div>
+                              <span className="text-gray-400">Duration:</span>
+                              {exercise.duration} min
+                            </div>
+                          )}
+                          {exercise.intensity && (
+                            <div>
+                              <span className="text-gray-400">Intensity:</span>
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs ${
+                                  exercise.intensity === "High"
+                                    ? "bg-red-900 text-red-200"
+                                    : exercise.intensity === "Medium"
+                                    ? "bg-yellow-900 text-yellow-200"
+                                    : "bg-green-900 text-green-200"
+                                }`}
+                              >
+                                {exercise.intensity}
+                              </span>
+                            </div>
+                          )}
                           {exercise.equipment && (
                             <div>
                               <span className="text-gray-400">Equipment:</span>{" "}
@@ -192,6 +209,34 @@ export default function ExercisePlanGenerator({plan}: Props) {
                             {exercise.description}
                           </p>
                         )}
+
+
+                        <div className="grid grid-cols-1 gap-4 text-base">
+                        {exercise.breakfast && (
+                            <div>
+                              <span className="text-gray-400">Breakfast: </span>
+                              {exercise.breakfast}
+                            </div>
+                          )}
+                          {exercise.lunch && (
+                            <div>
+                              <span className="text-gray-400">Lunch: </span>
+                              {exercise.lunch}
+                            </div>
+                          )}
+                          {exercise.snack && (
+                            <div>
+                              <span className="text-gray-400">Lunch: </span>
+                              {exercise.snack}
+                            </div>
+                          )}
+                          {exercise.dinner && (
+                            <div>
+                              <span className="text-gray-400">Dinner: </span>
+                              {exercise.dinner}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     );
                   })}
@@ -200,7 +245,20 @@ export default function ExercisePlanGenerator({plan}: Props) {
             </main>
           </div>
         ) : (
-          <p className="text-center text-gray-400">No weekly plan available.</p>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="36"
+            height="36"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={cn("animate-spin w-full mx-auto ")}
+          >
+            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+          </svg>
         )}
       </div>
     </div>
