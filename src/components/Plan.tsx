@@ -38,7 +38,7 @@ interface DayPlan {
 }
 
 interface Props {
-  plan: 'exercise' | 'nutrition'; 
+  plan: 'exercise' | 'nutrition' | 'yoga' | 'meditation'; 
 }
 
 export default function ExercisePlanGenerator({ plan }: Props) {
@@ -93,6 +93,7 @@ export default function ExercisePlanGenerator({ plan }: Props) {
     if (userId) {
       generatePlan();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   if (!userId) {
