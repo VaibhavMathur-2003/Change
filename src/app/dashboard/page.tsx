@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Dumbbell, NotebookIcon as Lotus, Brain, Apple } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Component() {
   const categories = [
@@ -16,14 +17,14 @@ export default function Component() {
       title: "Exercise",
       description: "Build strength and endurance",
       icon: Dumbbell,
-      image: "https://t3.ftcdn.net/jpg/05/72/91/08/360_F_572910874_gjyCeTnHtxFMIuPFcfE0djznBMgsU4Bf.jpg",
+      image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       color: "from-red-500 to-orange-500",
     },
     {
       title: "Yoga",
       description: "Improve flexibility and balance",
       icon: Lotus,
-      image: "https://www.shutterstock.com/image-vector/international-yoga-day-vector-illustration-260nw-1960577128.jpg",
+      image: "https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHlvZ2ElMjBiYW5uZXJ8ZW58MHwwfDB8fHww",
       color: "from-green-500 to-teal-500",
     },
     
@@ -31,14 +32,14 @@ export default function Component() {
       title: "Meditation",
       description: "Reduce stress and find inner peace",
       icon: Brain,
-      image: "https://t3.ftcdn.net/jpg/04/87/48/66/360_F_487486623_CatNgUbulZ6rOpENckeTzRfY7IzrqOKd.jpg",
+      image: "https://images.unsplash.com/photo-1526724038726-3007ffb8025f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fG1lZGl0YXRpb24lMjBiYW5uZXJ8ZW58MHwwfDB8fHww",
       color: "from-blue-500 to-indigo-500",
     },
     {
       title: "Nutrition",
       description: "Fuel your body with healthy foods",
       icon: Apple,
-      image: "https://thumbs.dreamstime.com/b/rice-vegetables-cooking-ingredients-bowls-dark-rustic-background-banner-healthy-vegetarian-food-diet-nutrition-82672613.jpg",
+      image: "https://images.unsplash.com/photo-1514995669114-6081e934b693?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       color: "from-yellow-500 to-green-500",
     },
   ];
@@ -63,10 +64,12 @@ export default function Component() {
               <div
                 className={`absolute inset-0 bg-gradient-to-r ${category.color} opacity-80`}
               ></div>
-              <img
+              <Image
+              width={700}
+              height={700}
                 src={category.image}
                 alt={category.title}
-                className="w-full h-full object-cover object-center transform group-hover:scale-110 transition-transform duration-300"
+                className="object-cover object-center transform group-hover:scale-110 transition-transform duration-300"
               />
               <div className="absolute top-4 left-4 bg-white/20 backdrop-blur-sm rounded-full p-2">
                 <category.icon className="w-6 h-6" />

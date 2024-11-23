@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NextRequest } from "next/server";
 import { generatePersonalizedPlan } from "@/actions/PlanGenerate";
 import Yoga from "../../../models/Yoga";
@@ -10,7 +12,7 @@ export async function POST(req: NextRequest) {
     planModel: WeeklyYogaPlans,
     itemModel: Yoga,
     planType: "Yoga",
-    createItem: async (item) => {
+    createItem: async (item: any) => {
       const newYoga = new Yoga({
         // Custom logic for yoga creation
         type: item.type || "strength",

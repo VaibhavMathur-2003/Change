@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest } from "next/server";
 import { generatePersonalizedPlan } from "@/actions/PlanGenerate";
 import Meditation from "../../../models/Meditation";
@@ -10,7 +11,7 @@ export async function POST(req: NextRequest) {
     planModel: WeeklyMeditationPlans,
     itemModel: Meditation,
     planType: "Meditation",
-    createItem: async (item) => {
+    createItem: async (item: any) => {
       const newMeditation = new Meditation({
         type: item.type || "relaxation",
         name: item.name,
@@ -21,12 +22,8 @@ export async function POST(req: NextRequest) {
     },
     generateUserPrompt: (
       userProfile,
-      fitnessParams
     ) => `Create a personalized weekly meditation plan for the following user:
-
       ${userProfile}
-
-
                 Return only valid JSON array with this structure:
                 [{
                   "day": "Monday",

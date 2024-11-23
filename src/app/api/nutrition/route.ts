@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NextRequest } from "next/server";
 import { generatePersonalizedPlan } from "@/actions/PlanGenerate";
 import Nutrition from "../../../models/Nutrition";
@@ -10,7 +12,7 @@ export async function POST(req: NextRequest) {
     planModel: WeeklyNutritionPlans,
     itemModel: Nutrition,
     planType: "Nutrition",
-    createItem: async (item) => {
+    createItem: async (item: any) => {
       const newNutrition = new Nutrition({
         breakfast: item.breakfast || [],
         lunch: item.lunch || [],
@@ -22,7 +24,6 @@ export async function POST(req: NextRequest) {
     },
     generateUserPrompt: (
       userProfile,
-      nutritionParams
     ) => `Just return a json. NO other text. Create a personalized weekly nutrition plan for the following user:
 
       ${userProfile}

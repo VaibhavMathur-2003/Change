@@ -26,10 +26,8 @@ export const FormSubmit = async (formData: FormData) => {
       fitnessLevel: fitnessLevel || "beginner",
     });
     await newUser.save();
-    return { success: true, redirect: "/dashboard" };
   
 } catch (error) {
     console.log(error);
-    return { message: "error creating todo" };
   }
 };

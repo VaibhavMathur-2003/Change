@@ -4,39 +4,48 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Calendar, Dumbbell, AlertCircle, Loader2 } from "lucide-react";
+import { Calendar, Dumbbell, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface Exercise {
-  type: string;
+interface BaseActivity {
   name: string;
+  type: string;
   duration: number;
   intensity: string;
-  equipment: string[];
-  targetMuscleGroups: string[];
   description?: string;
 }
-interface INutrition extends Exercise {
-  breakfast: string; // List of items to eat for breakfast
-  lunch: string; // List of items to eat for lunch
-  snack: string; // List of items to eat for a snack
-  dinner: string; // List of items to eat for dinner
-  mealTimes?: string; // Preferred meal times (optional)
+
+interface Exercise extends BaseActivity {
+  equipment: string[];
+  targetMuscleGroups: string[];
 }
+
+interface Nutrition extends BaseActivity {
+  breakfast: string;
+  lunch: string;
+  snack: string;
+  dinner: string;
+  mealTimes?: string;
+}
+
+type Activity = Exercise | Nutrition;
 
 interface DayPlan {
   day: string;
-  [key: string]: any; // Allow dynamic key for different plan types
+  Exercise?: Exercise[];
+  Nutrition?: Nutrition[];
+  [key: string]: unknown;
 }
+
 interface Props {
-  plan: string;
+  plan: 'exercise' | 'nutrition'; 
 }
+
 export default function ExercisePlanGenerator({ plan }: Props) {
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [weeklyPlan, setWeeklyPlan] = useState<DayPlan[] | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  const [selectedDay, setSelectedDay] = React.useState(0);
+  const [selectedDay, setSelectedDay] = useState(0);
 
   useEffect(() => {
     const storedUserId = localStorage.getItem("changeAuth");
@@ -47,7 +56,6 @@ export default function ExercisePlanGenerator({ plan }: Props) {
 
   const fetchExercisePlan = async (currentUserId: string) => {
     if (!currentUserId) return;
-    setLoading(true);
     setError(null);
 
     try {
@@ -70,8 +78,6 @@ export default function ExercisePlanGenerator({ plan }: Props) {
       setError(
         err instanceof Error ? err.message : "An unexpected error occurred"
       );
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -79,9 +85,10 @@ export default function ExercisePlanGenerator({ plan }: Props) {
     const storedUserId = localStorage.getItem("changeAuth");
     if (storedUserId) {
       setUserId(storedUserId);
-      fetchExercisePlan(storedUserId);
+      await fetchExercisePlan(storedUserId);
     }
   };
+
   useEffect(() => {
     if (userId) {
       generatePlan();
@@ -102,6 +109,9 @@ export default function ExercisePlanGenerator({ plan }: Props) {
       </Card>
     );
   }
+
+  const planKey = plan[0].toUpperCase() + plan.slice(1);
+  const currentDayPlan = weeklyPlan?.[selectedDay]?.[planKey] as Activity[] | undefined;
 
   return (
     <div className="min-h-screen bg-gray-900 text-white font-sans">
@@ -152,94 +162,83 @@ export default function ExercisePlanGenerator({ plan }: Props) {
               >
                 <h2 className="text-3xl font-bold mb-6"></h2>
                 <div className="space-y-6">
-                  {weeklyPlan[selectedDay][
-                    plan[0].toUpperCase() + plan.slice(1)
-                  ]?.map((exercise: Exercise | INutrition, index: string) => {
-                    return (
-                      <div
-                        key={index}
-                        className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-colors"
-                      >
-                        <div className="flex items-center mb-3">
-                          <Dumbbell className="h-8 w-8 text-purple-400 mr-3" />
-                          {exercise.name && (
-                            <h3 className="text-xl font-semibold">
-                              {exercise.name}
-                            </h3>
-                          )}
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          {exercise.type && (
-                            <div>
-                              <span className="text-gray-400">Type:</span>
-                              {exercise.type}
-                            </div>
-                          )}
-                          {exercise.duration && (
-                            <div>
-                              <span className="text-gray-400">Duration:</span>
-                              {exercise.duration} min
-                            </div>
-                          )}
-                          {exercise.intensity && (
-                            <div>
-                              <span className="text-gray-400">Intensity:</span>
-                              <span
-                                className={`px-2 py-1 rounded-full text-xs ${
-                                  exercise.intensity === "High"
-                                    ? "bg-red-900 text-red-200"
-                                    : exercise.intensity === "Medium"
-                                    ? "bg-yellow-900 text-yellow-200"
-                                    : "bg-green-900 text-green-200"
-                                }`}
-                              >
-                                {exercise.intensity}
-                              </span>
-                            </div>
-                          )}
-                          {exercise.equipment && (
-                            <div>
-                              <span className="text-gray-400">Equipment:</span>{" "}
-                              {exercise.equipment.join(", ")}
-                            </div>
-                          )}
-                        </div>
-                        {exercise.description && (
-                          <p className="text-gray-200 mt-3 text-base">
-                            {exercise.description}
-                          </p>
+                  {currentDayPlan?.map((activity, index) => (
+                    <div
+                      key={index}
+                      className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-colors"
+                    >
+                      <div className="flex items-center mb-3">
+                        <Dumbbell className="h-8 w-8 text-purple-400 mr-3" />
+                        {activity.name && (
+                          <h3 className="text-xl font-semibold">
+                            {activity.name}
+                          </h3>
                         )}
-
-
-                        <div className="grid grid-cols-1 gap-4 text-base">
-                        {exercise.breakfast && (
-                            <div>
-                              <span className="text-gray-400">Breakfast: </span>
-                              {exercise.breakfast}
-                            </div>
-                          )}
-                          {exercise.lunch && (
-                            <div>
-                              <span className="text-gray-400">Lunch: </span>
-                              {exercise.lunch}
-                            </div>
-                          )}
-                          {exercise.snack && (
-                            <div>
-                              <span className="text-gray-400">Lunch: </span>
-                              {exercise.snack}
-                            </div>
-                          )}
-                          {exercise.dinner && (
-                            <div>
-                              <span className="text-gray-400">Dinner: </span>
-                              {exercise.dinner}
-                            </div>
-                          )}
-                        </div>
                       </div>
-                    );
-                  })}
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        {activity.type && (
+                          <div>
+                            <span className="text-gray-400">Type: </span>
+                            {activity.type}
+                          </div>
+                        )}
+                        {activity.duration && (
+                          <div>
+                            <span className="text-gray-400">Duration: </span>
+                            {activity.duration} min
+                          </div>
+                        )}
+                        {activity.intensity && (
+                          <div>
+                            <span className="text-gray-400">Intensity: </span>
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs ${
+                                activity.intensity === "High"
+                                  ? "bg-red-900 text-red-200"
+                                  : activity.intensity === "Medium"
+                                  ? "bg-yellow-900 text-yellow-200"
+                                  : "bg-green-900 text-green-200"
+                              }`}
+                            >
+                              {activity.intensity}
+                            </span>
+                          </div>
+                        )}
+                        {'equipment' in activity && (
+                          <div>
+                            <span className="text-gray-400">Equipment: </span>
+                            {activity.equipment.join(", ")}
+                          </div>
+                        )}
+                      </div>
+                      {activity.description && (
+                        <p className="text-gray-200 mt-3 text-base">
+                          {activity.description}
+                        </p>
+                      )}
+
+                      {'breakfast' in activity && (
+                        <div className="grid grid-cols-1 gap-4 text-base">
+                          <div>
+                            <span className="text-gray-400">Breakfast: </span>
+                            {activity.breakfast}
+                          </div>
+                          <div>
+                            <span className="text-gray-400">Lunch: </span>
+                            {activity.lunch}
+                          </div>
+                          <div>
+                            <span className="text-gray-400">Snack: </span>
+                            {activity.snack}
+                          </div>
+                          <div>
+                            <span className="text-gray-400">Dinner: </span>
+                            {activity.dinner}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </motion.div>
             </main>
@@ -255,7 +254,7 @@ export default function ExercisePlanGenerator({ plan }: Props) {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className={cn("animate-spin w-full mx-auto ")}
+            className={cn("animate-spin w-full mx-auto")}
           >
             <path d="M21 12a9 9 0 1 1-6.219-8.56" />
           </svg>

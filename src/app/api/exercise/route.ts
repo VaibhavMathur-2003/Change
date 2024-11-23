@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest } from "next/server";
 import { generatePersonalizedPlan } from "@/actions/PlanGenerate";
 import Exercise from "../../../models/Exercise";
@@ -10,7 +11,7 @@ export async function POST(req: NextRequest) {
     planModel: WeeklyExercisePlans,
     itemModel: Exercise,
     planType: "Exercise",
-    createItem: async (item) => {
+    createItem: async (item: any) => {
       const newExercise = new Exercise({
         type: item.type || "strength",
         name: item.name,
