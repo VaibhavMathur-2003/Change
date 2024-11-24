@@ -21,6 +21,7 @@ import {
   Brain,
   Heart,
   Zap,
+  LoaderCircle,
 } from "lucide-react";
 import { FormSubmit } from "@/actions/FormSubmit";
 import { v4 } from "uuid";
@@ -46,12 +47,21 @@ export default function FitnessForm() {
     injuries: "",
   });
 
+  const [loading, setLoading] = useState(false);
   const handleInputChange = (name: string, value: string | number) => {
     setFormData({ ...formData, [name]: value });
   };
-  const handleAuth = () => {
-    localStorage.setItem("changeAuth", formData.uuid);
-    router.push("/dashboard");
+  const handleAuth = async () => {
+    setLoading(true);
+    try {
+      localStorage.setItem("changeAuth", formData.uuid);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error starting fitness journey", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const steps = [
@@ -336,7 +346,14 @@ export default function FitnessForm() {
                   type="submit"
                   className="bg-green-600 hover:bg-green-700"
                 >
-                  Start My Fitness Journey
+                  {loading ? (
+                    <>
+                      <LoaderCircle className="animate-spin mr-2 h-4 w-4" />{" "}
+                      Please Wait
+                    </>
+                  ) : (
+                    "Start My Fitness Journey"
+                  )}
                 </Button>
               </form>
             )}
