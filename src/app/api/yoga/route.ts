@@ -29,28 +29,38 @@ export async function POST(req: NextRequest) {
     generateUserPrompt: (
       userProfile,
       fitnessParams
-    ) => `Just return a json. NO other text. Create a personalized weekly yoga plan for the following user:
+    ) => `Provide only a valid JSON response. Do not include any additional text or commentary.
 
+      Generate a personalized weekly yoga plan for the user based on the provided details:
+
+      User Profile:
       ${userProfile}
 
       Training Parameters:
-      - Recommended workout duration: ${fitnessParams.workoutDuration} minutes
-      - Rest periods: ${fitnessParams.restPeriods}
-      - Yoga complexity: ${fitnessParams.complexity}
+      - Recommended Workout Duration: ${fitnessParams.workoutDuration} minutes per session
+      - Rest Periods: ${fitnessParams.restPeriods}
+      - Yoga Complexity: ${fitnessParams.complexity}
 
-                Return only valid JSON array with this structure:
-                [{
-                  "day": "Monday",
-                  "yogas": [{
-                    "type": "strength",
-                    "name": "Yoga Name",
-                    "duration": 30,
-                    "intensity": "medium",
-                    "equipment": ["item1"],
-                    "targetMuscleGroups": ["muscle1"],
-                    "description": "Description"
-                  }]
-                }],
+      Output the plan as a JSON array with the following structure:
+      [
+        {
+          "day": "Monday",
+          "yogas": [
+            {
+              "type": "strength",
+              "name": "Yoga Name",
+              "duration": 30,
+              "intensity": "medium",
+              "equipment": ["item1"],
+              "targetMuscleGroups": ["muscle1"],
+              "description": "Description of the yoga pose or flow"
+            }
+          ]
+        }
+      ]
+
+      Ensure the JSON is syntactically correct and adheres to the specified structure.
+
     `,
     systemPrompt:
       "You are a professional fitness trainer specializing in creating personalized yoga plans...",

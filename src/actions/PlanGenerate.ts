@@ -105,7 +105,7 @@ export async function generatePersonalizedPlan(
     let weeklyPlan;
     try {
       const completion = await groq.chat.completions.create({
-        model: "mixtral-8x7b-32768",
+        model: "gemma2-9b-it",
         messages: [
           {
             role: "system",
@@ -143,7 +143,6 @@ export async function generatePersonalizedPlan(
       
       await Promise.all(
         weeklyPlan.map(async (dayPlan: any) => {
-          console.log(config.planType)
           const itemPromises = dayPlan[`${config.planType.toLowerCase()}s`].map(
             async (item: any) => await config.createItem(item)
           );

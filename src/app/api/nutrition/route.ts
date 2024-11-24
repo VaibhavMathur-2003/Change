@@ -24,23 +24,34 @@ export async function POST(req: NextRequest) {
     },
     generateUserPrompt: (
       userProfile,
-    ) => `Just return a json. NO other text. Create a personalized weekly nutrition plan for the following user:
+    ) => `Provide only a valid JSON response. Do not include any additional text or commentary.
 
-      ${userProfile}
+        Generate a personalized weekly nutrition plan for the user based on the provided details:
 
-      Dietary Parameters:
-    
-                Return only valid JSON array with this structure:
-                [{
-                  "day": "Monday",
-                   "nutritions": [{
-                    "breakfast": "all items (string only)",
-                    "lunch": "all items (string only)",
-                    "snack": "all items (string only)",
-                    "dinner": "all items (string only)",
-                    "mealTimes": "all items (string only)"
-                  }]
-                }],
+        User Profile:
+        ${userProfile}
+
+        Dietary Parameters:
+        <Add any specific dietary parameters if applicable>
+
+        Output the plan as a JSON array with the following structure:
+        [
+          {
+            "day": "Monday",
+            "nutritions": [
+              {
+                "breakfast": "List all items as a single string",
+                "lunch": "List all items as a single string",
+                "snack": "List all items as a single string",
+                "dinner": "List all items as a single string",
+                "mealTimes": "List all meal times as a single string"
+              }
+            ]
+          }
+        ]
+
+        Ensure the JSON is syntactically correct and adheres to the specified structure.
+
     `,
     systemPrompt:
       "You are a professional nutritionist specializing in creating personalized meal plans...",

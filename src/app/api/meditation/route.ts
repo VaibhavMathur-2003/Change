@@ -21,19 +21,31 @@ export async function POST(req: NextRequest) {
       return await newMeditation.save();
     },
     generateUserPrompt: (
-      userProfile,
-    ) => `Create a personalized weekly meditation plan for the following user:
+      userProfile
+    ) => `Provide only a valid JSON response. Do not include any additional text or commentary.
+
+      Generate a personalized weekly meditation plan for the user based on the provided details:
+
+      User Profile:
       ${userProfile}
-                Return only valid JSON array with this structure:
-                [{
-                  "day": "Monday",
-                  "meditations": [{
-                    "type": "mind relax",
-                    "name": "Meditation Name",
-                    "duration": 30,
-                    "description": "Description"
-                  }]
-                }],
+
+      Output the plan as a JSON array with the following structure:
+      [
+        {
+          "day": "Monday",
+          "meditations": [
+            {
+              "type": "mind relax",
+              "name": "Meditation Name",
+              "duration": 30,
+              "description": "Description of the meditation"
+            }
+          ]
+        }
+      ]
+
+      Ensure the JSON is syntactically correct and adheres to the specified structure.
+
     `,
     systemPrompt:
       "You are a professional fitness trainer specializing in creating personalized meditation plans...",

@@ -26,29 +26,37 @@ export async function POST(req: NextRequest) {
     generateUserPrompt: (
       userProfile,
       fitnessParams
-    ) => `Just return a json. NO other text. Create a personalized weekly exercise plan for the following user:
+    ) => `Provide only a valid JSON response. Do not include any additional text or commentary. 
 
+      Generate a personalized weekly exercise plan for the user based on the provided details:
+
+      User Profile:
       ${userProfile}
 
       Training Parameters:
-      - Recommended workout duration: ${fitnessParams.workoutDuration} minutes
-      - Rest periods: ${fitnessParams.restPeriods}
-      - Exercise complexity: ${fitnessParams.complexity}
+      - Workout Duration: ${fitnessParams.workoutDuration} minutes per session
+      - Rest Periods: ${fitnessParams.restPeriods}
+      - Exercise Complexity: ${fitnessParams.complexity}
 
-                Return only valid JSON array with this structure:
-                [{
-                  "day": "Monday",
-                  "exercises": [{
-                    "type": "strength",
-                    "name": "Exercise Name",
-                    "duration": 30,
-                    "intensity": "medium",
-                    "equipment": ["item1"],
-                    "targetMuscleGroups": ["muscle1"],
-                    "description": "Description"
-                  }]
-                }],
-    `,
+      Output the plan as a JSON array with the following structure:
+      [
+        {
+          "day": "Monday",
+          "exercises": [
+            {
+              "type": "strength",
+              "name": "Exercise Name",
+              "duration": 30,
+              "intensity": "medium",
+              "equipment": ["item1"],
+              "targetMuscleGroups": ["muscle1"],
+              "description": "Description of the exercise"
+            }
+          ]
+        }
+      ]
+
+      Ensure the JSON is syntactically correct and adheres to the specified structure.`,
     systemPrompt:
       "You are a professional fitness trainer specializing in creating personalized exercise plans...",
   });
