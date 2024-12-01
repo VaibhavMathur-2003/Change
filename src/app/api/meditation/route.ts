@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
             {
               "type": "mind relax",
               "name": "Meditation Name",
-              "duration": 30,
+              "duration": 60,
               "description": "Description of the meditation"
             }
           ]

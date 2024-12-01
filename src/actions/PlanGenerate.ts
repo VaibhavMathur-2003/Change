@@ -24,6 +24,25 @@ async function connectDB() {
   await mongoose.connect(MONGODB_URI!);
 }
 
+function extractJSON(content: string): any {
+  try {
+    return JSON.parse(content);
+  } catch (directParseError) {
+    const jsonMatches = content.match(/\{(?:[^{}]|(?:\{(?:[^{}]|(?:\{[^{}]*\})?)*\}))*\}/g);
+    
+    if (jsonMatches) {
+      for (const jsonStr of jsonMatches) {
+        try {
+          return JSON.parse(jsonStr);
+        } catch (parseError) {
+          continue;
+        }
+      }
+    }
+    throw directParseError;
+  }
+}
+
 export async function generatePersonalizedPlan(
   req: NextRequest, 
   config: FitnessPlanConfig
@@ -57,7 +76,6 @@ export async function generatePersonalizedPlan(
       );
     }
 
-    // Check for existing plan
     const existingPlans = user[`weekly${config.planType}Plans`];
     if (existingPlans && existingPlans.length > 0) {
       return NextResponse.json({
@@ -68,7 +86,6 @@ export async function generatePersonalizedPlan(
       });
     }
 
-    // Generate user profile and fitness parameters
     const userProfile = `
       Age: ${user.age}
       Gender: ${user.gender}
@@ -86,12 +103,12 @@ export async function generatePersonalizedPlan(
         complexity: "basic",
       },
       intermediate: {
-        workoutDuration: "60-75",
+        workoutDuration: "60-90",
         restPeriods: "moderate",
         complexity: "moderate",
       },
       advanced: {
-        workoutDuration: "75-90",
+        workoutDuration: "90-120",
         restPeriods: "shorter",
         complexity: "advanced",
       },
@@ -101,7 +118,6 @@ export async function generatePersonalizedPlan(
       intensityMap[user.fitnessLevel as keyof typeof intensityMap] ||
       intensityMap.beginner;
 
-    // Generate plan using Groq API
     let weeklyPlan;
     try {
       const completion = await groq.chat.completions.create({
@@ -116,7 +132,7 @@ export async function generatePersonalizedPlan(
             content: config.generateUserPrompt(userProfile, fitnessParams),
           },
         ],
-        temperature: 0.7,
+        temperature: 0.6,
         max_tokens: 4000,
       });
 
@@ -124,7 +140,8 @@ export async function generatePersonalizedPlan(
         throw new Error("Invalid response format from Groq API");
       }
 
-      const parsedContent = JSON.parse(completion.choices[0].message.content);
+      const parsedContent = extractJSON(completion.choices[0].message.content);
+      
       if (!Array.isArray(parsedContent)) {
         throw new Error("Invalid response format: not an array");
       }
@@ -133,14 +150,16 @@ export async function generatePersonalizedPlan(
     } catch (error) {
       console.error(`Error with Groq API for ${config.planType}:`, error);
       return NextResponse.json(
-        { success: false, message: `Failed to generate ${config.planType.toLowerCase()} plan` },
+        { 
+          success: false, 
+          message: `Failed to generate ${config.planType.toLowerCase()} plan`, 
+          error: error instanceof Error ? error.message : "Unknown parsing error" 
+        },
         { status: 500 }
       );
     }
 
-    // Save generated plan
     if (weeklyPlan) {
-      
       await Promise.all(
         weeklyPlan.map(async (dayPlan: any) => {
           const itemPromises = dayPlan[`${config.planType.toLowerCase()}s`].map(

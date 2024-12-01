@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
             {
               "type": "strength",
               "name": "Yoga Name",
-              "duration": 30,
+              "duration": 60,
               "intensity": "medium",
               "equipment": ["item1"],
               "targetMuscleGroups": ["muscle1"],
