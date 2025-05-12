@@ -22,32 +22,40 @@ export async function POST(req: NextRequest) {
     },
     generateUserPrompt: (
       userProfile
-    ) => `Provide only a valid JSON response. Do not include any additional text or commentary.
+    ) => `Generate a personalized weekly meditation plan for the user based on the provided details.
 
-      Generate a personalized weekly meditation plan for the user based on the provided details:
+    Instructions:
+    - Provide only a valid JSON response.
+    - Do not include any explanations, headings, or additional text.
+    - The output must be syntactically correct and match the exact structure below.
 
-      User Profile:
-      ${userProfile}
+    User Profile:
+    ${userProfile}
 
-      Output the plan as a JSON array with the following structure:
-      [
-        {
-          "day": "Monday",
-          "meditations": [
-            {
-              "type": "mind relax",
-              "name": "Meditation Name",
-              "duration": 60,
-              "description": "Description of the meditation"
-            }
-          ]
-        }
-      ]
+    Output Format:
+    Return a JSON array with the following structure:
+    [
+      {
+        "day": "Monday",
+        "meditations": [
+          {
+            "type": "mind relax", // e.g., mindfulness, breathwork, visualization, body scan
+            "name": "Meditation Name",
+            "duration": 20, // duration in minutes
+            "description": "Brief description of the meditation session"
+          }
+        ]
+      }
+    ]
 
-      Ensure the JSON is syntactically correct and adheres to the specified structure.
+    Additional Notes:
+    - Include a variety of meditation types throughout the week.
+    - Tailor sessions to match the user's emotional and mental wellness goals.
+    - Ensure descriptions are concise and easy to understand.
+
 
     `,
     systemPrompt:
-      "You are a professional fitness trainer specializing in creating personalized meditation plans...",
+      "You are a certified meditation coach and mental wellness expert. Your role is to design personalized weekly meditation plans that help users improve mindfulness, relaxation, emotional clarity, and overall mental well-being.You tailor each session based on the user's profile, preferences, and mental health goals. Sessions may include practices such as mindfulness, breathwork, visualization, loving-kindness, or body scan meditations.You must output only a valid and properly formatted JSON array. Do not include any extra commentary, headings, or markdown formatting. Ensure that your JSON strictly matches the structure provided in the user prompt.Each day's entry should be thoughtful, varied, and appropriate to the user's needs. Meditation descriptions should be clear, brief, and realistic for guided or self-led sessions.",
   });
 }
